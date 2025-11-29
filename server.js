@@ -14,6 +14,50 @@ const path = require('path');
 const admin = require('firebase-admin'); // ESSENCIAL: Importa o Admin SDK
 const app = express();
 
+const FIREBASE_CONFIG = {
+  apiKey: process.env.FIREBASE_API_KEY || null,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN || null,
+  projectId: process.env.FIREBASE_PROJECT_ID || null,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || null,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || null,
+  appId: process.env.FIREBASE_APP_ID || null,
+  measurementId: process.env.FIREBASE_MEASUREMENT_ID || null
+};
+
+// String JSON que será injetada.
+const firebaseConfigJson = JSON.stringify(FIREBASE_CONFIG);
+
+// Função de utilidade para ler e injetar no HTML
+function serveHtmlWithConfig(filePath, res) {
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Falha ao ler o arquivo HTML:', err);
+      return res.status(500).send('Erro interno do servidor: Falha ao carregar a página.');
+    }
+
+    // ✅ CORREÇÃO CHAVE: Usa Regex Global para substituir TODAS as ocorrências
+    const htmlComConfig = data.replace(
+      /__FIREBASE_CONFIG_PLACEHOLDER__/g,
+      firebaseConfigJson
+    );
+
+    res.send(htmlComConfig);
+  });
+}
+
+// ROTAS: Adicione esta função a TODAS as rotas que precisam da config
+app.get('/connect.html', (req, res) => {
+  serveHtmlWithConfig(path.join(__dirname, 'public', 'connect.html'), res);
+});
+
+app.get('/loginqrcode.html', (req, res) => {
+  serveHtmlWithConfig(path.join(__dirname, 'public', 'loginqrcode.html'), res);
+});
+
+app.get('/login.html', (req, res) => {
+  serveHtmlWithConfig(path.join(__dirname, 'public', 'login.html'), res);
+});
+
 // --- VARIÁVEIS DE CONFIGURAÇÃO DO USUÁRIO (Como fallback) ---
 const USER_GCP_CREDENTIALS_FILE = 'gcp-service-account.json';
 const USER_WEBSITE_ORIGIN = 'https://dramarcellamardegan.com.br';
@@ -76,6 +120,9 @@ const CALENDAR_ID = process.env.CALENDAR_ID;
 const DENTIST_EMAIL = process.env.DENTIST_EMAIL;
 const DENTIST_PHONE = process.env.DENTIST_PHONE;
 const PORT = process.env.PORT || 4000;
+
+
+
 // Agora usa a URL da Dra. Marcella como fallback
 const LINK_AGENDAMENTO = (process.env.LINK_AGENDAMENTO || USER_WEBSITE_ORIGIN).replace(/['"]/g, '');
 const DURACAO_CONSULTA_MIN = Number(process.env.DURACAO_CONSULTA_MIN || 30);
