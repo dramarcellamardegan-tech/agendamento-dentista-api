@@ -183,27 +183,19 @@
         </form>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-
-    <script>
+    <script type="module">
+        // 🛑 CORREÇÃO CRÍTICA: Importação do SDK Modular
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         // Variáveis de Configuração
         const DASHBOARD_URL = 'dashboard.html';
 
         // --- SUAS CREDENCIAIS REAIS DO FIREBASE JS SDK ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyCmkW8PIn44oUvpW5n-JnaIqrME1lpeZwE",
-            authDomain: "agendamento-com-chatbot.firebaseapp.com",
-            projectId: "agendamento-com-chatbot",
-            storageBucket: "agendamento-com-chatbot.firebasestorage.app",
-            messagingSenderId: "579255967956",
-            appId: "1:579255967956:web:8dda8b717a82f837169b41",
-            measurementId: "G-DXCZ18JKJ5"
-        };
+        const firebaseConfig = JSON.parse('__FIREBASE_CONFIG_PLACEHOLDER__');
 
-        // --- INICIALIZAÇÃO DO FIREBASE ---
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
+        // Inicialização do Firebase e Auth (mantenha como está)
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
         // Elementos do DOM
         const form = document.getElementById('loginForm');
@@ -239,7 +231,7 @@
             try {
                 // 1. AUTENTICAÇÃO SIMPLES NO FIREBASE
                 displayMessage('Fazendo login...', 'info');
-                await auth.signInWithEmailAndPassword(email, password);
+                await signInWithEmailAndPassword(auth, email, password)
 
                 // 2. SUCESSO!
                 displayMessage('✅ Login bem-sucedido. Redirecionando...', 'success');
