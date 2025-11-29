@@ -99,17 +99,11 @@
         // 🛑 VARIÁVEL DE CONFIGURAÇÃO CRÍTICA
         const LOGIN_URL = 'loginqrcode.html';
 
+
+
         // Variáveis globais do ambiente (MANDATÓRIO)
         const appId = 'default-app-id'; // Pode manter o default
-        const firebaseConfig = {
-            apiKey: "AIzaSyCmkW8PIn44oUvpW5n-JnaIqrME1lpeZwE",
-            authDomain: "agendamento-com-chatbot.firebaseapp.com",
-            projectId: "agendamento-com-chatbot",
-            storageBucket: "agendamento-com-chatbot.firebasestorage.app",
-            messagingSenderId: "579255967956",
-            appId: "1:579255967956:web:8dda8b717a82f837169b41",
-            measurementId: "G-DXCZ18JKJ5"
-        }; // AGORA COM A CONFIGURAÇÃO REAL
+        const firebaseConfig = JSON.parse('__FIREBASE_CONFIG_PLACEHOLDER__');
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         // Elementos da UI
@@ -294,6 +288,12 @@
 
             } catch (error) {
                 console.error("Erro na inicialização do Firebase ou Auth:", error);
+
+                // 🛑 CORREÇÃO CONTRA TELA BRANCA:
+                // Se a inicialização falhar (devido a JSON inválido ou config incorreta),
+                // forçamos a exibição para mostrar a UI de erro.
+                document.body.style.display = 'flex';
+
                 updateUI('error', null, error.message);
             }
         }
